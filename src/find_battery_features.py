@@ -35,7 +35,6 @@ def draw_crosshair(image,battery_centre):
 
 def find_features(input_image,thresh_low,thresh_high):
 
-
     ret, thresh = cv2.threshold(input_image, thresh_low, 255, cv2.THRESH_BINARY_INV)
     ret2, thresh2 = cv2.threshold(input_image, thresh_high, 255, cv2.THRESH_BINARY)
 
@@ -58,7 +57,7 @@ def find_features(input_image,thresh_low,thresh_high):
     battery_centre = (int(x + w / 2), int(y + h / 2))
 
     label = ("BATTERY CENTRE X: " + str(battery_centre[0]) + " Y:" + str(battery_centre[1]))
-    battery_outline = cv2.putText(battery_outline, label, (25, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, 255)
+    battery_outline = cv2.putText(battery_outline, label, (250, 80), cv2.FONT_HERSHEY_SIMPLEX, 2, color = (255, 0, 0),thickness=8)
 
     battery_outline = draw_crosshair(battery_outline, battery_centre)
 
