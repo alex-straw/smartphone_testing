@@ -5,18 +5,20 @@ import matplotlib.pyplot as plt
 
 import find_battery_template
 import find_battery_features
+import find_battery_shape
 
 class phone:
-    def __init__(self,number,thresh_lower,thresh_upper,actual_battery_centre):
+    def __init__(self,number,thresh_lower,thresh_upper,actual_battery_centre,epsilon):
         self.number = number
         self.thresh_lower = thresh_lower
         self.thresh_upper = thresh_upper
         self.actual_battery_centre = actual_battery_centre
+        self.epsilon = epsilon #Used for approximating in find_battery_shape.py
 
-phone_1 = phone(1, 39, 66,[754,1168])
-phone_2 = phone(2, 22, 56,[939,1042])
-phone_3 = phone(3, 55, 102,[663,1278])
-phone_4 = phone(4, 51, 153,[1174,1607])
+phone_1 = phone(1, 39, 66,[754,1168],0.05)
+phone_2 = phone(2, 22, 56,[939,1042],0.05)
+phone_3 = phone(3, 55, 102,[663,1278],0.01)
+phone_4 = phone(4, 65, 153,[1174,1607],0.05)
 
 def get_phone_image(phone,current_path):
     image_path = current_path + '/photographs/phone_' + str(phone) + '.jpg'
@@ -60,10 +62,11 @@ def plot_images(image,windowhandle,final_plot_scale):
 
 def main():
     current_path = os.path.dirname(__file__)
-    current_phone = phone_1
+    current_phone = phone_4
     final_plot_scale = 30
     thresh_l = current_phone.thresh_lower
     thresh_h = current_phone.thresh_upper
+    epsilon = current_phone.epsilon
     window_handle = "phone " + str(current_phone.number)
 
     image = get_phone_image(current_phone.number,current_path)
@@ -73,11 +76,15 @@ def main():
 
     located_image_template,template_centre = find_battery_template.find_template(image,template)
     located_image_features,features_centre = find_battery_features.find_features(image,thresh_l,thresh_h)
+    located_image_shapes, shape_centre = find_battery_shape.find_shape(image, thresh_l, thresh_h,epsilon)
 
+    print("template error:" + str(100*calculate_average_error(current_phone.actual_battery_centre, template_centre)))
+    print("features error:" + str(100*calculate_average_error(current_phone.actual_battery_centre, features_centre)))
+    print("shape error:" + str(100*calculate_average_error(current_phone.actual_battery_centre, shape_centre)))
 
-    error = calculate_average_error(current_phone.actual_battery_centre, features_centre)
-
-    plot_images(located_image_features,window_handle,final_plot_scale)
+    plot_images(located_image_shapes,window_handle,final_plot_scale)
+    plot_images(located_image_features,window_handle + "1",final_plot_scale)
+    plot_images(located_image_template, window_handle + "2", final_plot_scale)
     print(error*100)
 
 if __name__ == "__main__":
