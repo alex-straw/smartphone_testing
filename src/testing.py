@@ -3,6 +3,8 @@ import cv2
 import os
 import matplotlib.pyplot as plt
 
+import find_battery_template
+
 
 class phone:
     def __init__(self,number,thresh_lower,thresh_upper,actual_battery_centre):
@@ -26,6 +28,9 @@ def get_template(phone,current_path):
     image = cv2.imread(image_path, 0)
     return(image)
 
+def make_label(image,centre):
+    pass
+
 def scale_image(image,scale_percent):
     width = int(image.shape[1] * scale_percent / 100)
     height = int(image.shape[0] * scale_percent / 100)
@@ -34,10 +39,10 @@ def scale_image(image,scale_percent):
     image = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
     return(image)
 
-def plot_all(image,current_phone,final_plot_scale):
-    windowhandle = "Finding battery for phone " + str(current_phone.number)
+def plot_all(image,located_image,current_phone,final_plot_scale):
+    windowhandle = "Methods (1: Original, 2: Template, 3: Shape, 4: Contour Area) Phone " + str(current_phone.number)
 
-    hori = np.concatenate((image,image), axis = 1)
+    hori = np.concatenate((image,located_image), axis = 1)
     hori = scale_image(hori,final_plot_scale)
 
     cv2.imshow(windowhandle,hori)
@@ -50,9 +55,12 @@ def main():
 
     image = get_phone_image(current_phone.number,current_path)
     template = get_template(current_phone.number,current_path)
-    actual_battery_centre = current_phone.actual_battery_centre
 
-    plot_all(image,current_phone,final_plot_scale)
+    """ TEMPLATE MATCH USING find_battery_template.py """
+
+    located_image,template_centre = find_battery_template.find_template(image,template)
+
+    plot_all(image,located_image,current_phone,final_plot_scale)
 
 if __name__ == "__main__":
     main()
