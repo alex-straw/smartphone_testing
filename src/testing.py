@@ -4,19 +4,19 @@ import os
 import matplotlib.pyplot as plt
 
 import find_battery_template
-
+import find_battery_features
 
 class phone:
     def __init__(self,number,thresh_lower,thresh_upper,actual_battery_centre):
         self.number = number
         self.thresh_lower = thresh_lower
-        self.thres_upper = thresh_upper
+        self.thresh_upper = thresh_upper
         self.actual_battery_centre = actual_battery_centre
 
-phone_1 = phone(1, 45, 105,[754,1168])
-phone_2 = phone(2, 70, 102,[939,1042])
-phone_3 = phone(3, 100, 150,[663,1278])
-phone_4 = phone(4, 20, 255,[1174,1607])
+phone_1 = phone(1, 39, 66,[754,1168])
+phone_2 = phone(2, 22, 56,[939,1042])
+phone_3 = phone(3, 55, 102,[663,1278])
+phone_4 = phone(4, 51, 153,[1174,1607])
 
 def get_phone_image(phone,current_path):
     image_path = current_path + '/photographs/phone_' + str(phone) + '.jpg'
@@ -28,8 +28,19 @@ def get_template(phone,current_path):
     image = cv2.imread(image_path, 0)
     return(image)
 
-def make_label(image,centre):
-    pass
+def calculate_average_error(true_centre,estimated_centre):
+
+    def error(true_value,estimated_value):
+        error_decimal = ( abs(true_value - estimated_value) / true_value )
+        return(error_decimal)
+
+    error_x = error(true_centre[0],estimated_centre[0])
+    error_y = error(true_centre[1], estimated_centre[1])
+
+    average_error = (error_x + error_y)/2
+
+    return(average_error)
+
 
 def scale_image(image,scale_percent):
     width = int(image.shape[1] * scale_percent / 100)
@@ -39,28 +50,35 @@ def scale_image(image,scale_percent):
     image = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
     return(image)
 
-def plot_all(image,located_image,current_phone,final_plot_scale):
-    windowhandle = "Methods (1: Original, 2: Template, 3: Shape, 4: Contour Area) Phone " + str(current_phone.number)
+def plot_images(image,windowhandle,final_plot_scale):
 
-    hori = np.concatenate((image,located_image), axis = 1)
-    hori = scale_image(hori,final_plot_scale)
-
-    cv2.imshow(windowhandle,hori)
+    image = scale_image(image, final_plot_scale)
+    cv2.namedWindow(windowhandle)  # Create a named window
+    cv2.moveWindow(windowhandle, 40, 30)  # Move it to (40,30)
+    cv2.imshow(windowhandle, image)
     cv2.waitKey(10000)
 
 def main():
     current_path = os.path.dirname(__file__)
-    current_phone = phone_2
-    final_plot_scale = 20
+    current_phone = phone_1
+    final_plot_scale = 30
+    thresh_l = current_phone.thresh_lower
+    thresh_h = current_phone.thresh_upper
+    window_handle = "phone " + str(current_phone.number)
 
     image = get_phone_image(current_phone.number,current_path)
     template = get_template(current_phone.number,current_path)
 
     """ TEMPLATE MATCH USING find_battery_template.py """
 
-    located_image,template_centre = find_battery_template.find_template(image,template)
+    located_image_template,template_centre = find_battery_template.find_template(image,template)
+    located_image_features,features_centre = find_battery_features.find_features(image,thresh_l,thresh_h)
 
-    plot_all(image,located_image,current_phone,final_plot_scale)
+
+    error = calculate_average_error(current_phone.actual_battery_centre, features_centre)
+
+    plot_images(located_image_features,window_handle,final_plot_scale)
+    print(error*100)
 
 if __name__ == "__main__":
     main()
