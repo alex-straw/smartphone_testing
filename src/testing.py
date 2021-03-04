@@ -9,17 +9,18 @@ import find_battery_features
 import find_battery_shape
 
 class phone:
-    def __init__(self,number,thresh_lower,thresh_upper,actual_battery_centre,epsilon):
+    def __init__(self,number,thresh_lower,thresh_upper,actual_battery_centre,epsilon,cnt_area):
         self.number = number
         self.thresh_lower = thresh_lower
         self.thresh_upper = thresh_upper
         self.actual_battery_centre = actual_battery_centre
         self.epsilon = epsilon #Used for approximating in find_battery_shape.py
+        self.cnt_area = cnt_area
 
-phone_1 = phone(1, 39, 66,[754,1168],0.05)
-phone_2 = phone(2, 22, 56,[939,1042],0.05)
-phone_3 = phone(3, 55, 102,[663,1278],0.01)
-phone_4 = phone(4, 65, 153,[1174,1607],0.05)
+phone_1 = phone(1, 39, 66,[754,1168],0.05,10000)
+phone_2 = phone(2, 22, 56,[939,1042],0.05,100000)
+phone_3 = phone(3, 53, 87,[663,1278],0.02,500000)
+phone_4 = phone(4, 65, 153,[1174,1607],0.05,500000)
 
 def get_phone_image(phone,current_path):
     image_path = current_path + '/photographs/phone_' + str(phone) + '.jpg'
@@ -64,12 +65,12 @@ def plot_images(image,windowhandle,final_plot_scale):
 
 def main():
     current_path = os.path.dirname(__file__)
-    current_phone = phone_2
+    current_phone = phone_3
     final_plot_scale = 30
     thresh_l = current_phone.thresh_lower
     thresh_h = current_phone.thresh_upper
     epsilon = current_phone.epsilon
-    window_handle = "phone " + str(current_phone.number)
+    cnt_area = current_phone.cnt_area
 
     image = get_phone_image(current_phone.number,current_path)
     template = get_template(current_phone.number,current_path)
@@ -78,7 +79,7 @@ def main():
 
     located_image_template,template_centre = find_battery_template.find_template(image,template)
     located_image_features,features_centre = find_battery_features.find_features(image,thresh_l,thresh_h)
-    located_image_shapes, shape_centre = find_battery_shape.find_shape(image, thresh_l, thresh_h,epsilon)
+    located_image_shapes, shape_centre = find_battery_shape.find_shape(image, thresh_l, thresh_h,epsilon,cnt_area)
 
     template_error = str(100*calculate_average_error(current_phone.actual_battery_centre, template_centre))
     features_error = str(100*calculate_average_error(current_phone.actual_battery_centre, features_centre))

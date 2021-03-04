@@ -13,7 +13,7 @@ def remove_background(image):
     return(background_removed)
 
 
-def find_shape(image,thresh_low,thresh_high,epsilon):
+def find_shape(image,thresh_low,thresh_high,epsilon,cnt_area):
 
     ret, thresh = cv2.threshold(image, thresh_low, 255, cv2.THRESH_BINARY_INV)
     ret2, thresh2 = cv2.threshold(image, thresh_high, 255, cv2.THRESH_BINARY)
@@ -31,7 +31,7 @@ def find_shape(image,thresh_low,thresh_high,epsilon):
     # For each contour approximate the curve and
     # detect the shapes.
     for cnt in contours:
-        if cv2.contourArea(cnt) > 500000:
+        if cv2.contourArea(cnt) > cnt_area:
             epsilon = epsilon * cv2.arcLength(cnt, True)
             approx = cv2.approxPolyDP(cnt, epsilon, True)
 
