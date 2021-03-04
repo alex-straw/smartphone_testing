@@ -2,6 +2,7 @@ import numpy as np
 import cv2
 import os
 import matplotlib.pyplot as plt
+import math
 
 import find_battery_template
 import find_battery_features
@@ -41,6 +42,7 @@ def calculate_average_error(true_centre,estimated_centre):
 
     average_error = (error_x + error_y)/2
 
+    average_error = round(average_error,5)
     return(average_error)
 
 
@@ -58,11 +60,11 @@ def plot_images(image,windowhandle,final_plot_scale):
     cv2.namedWindow(windowhandle)  # Create a named window
     cv2.moveWindow(windowhandle, 40, 30)  # Move it to (40,30)
     cv2.imshow(windowhandle, image)
-    cv2.waitKey(10000)
+    cv2.waitKey()
 
 def main():
     current_path = os.path.dirname(__file__)
-    current_phone = phone_4
+    current_phone = phone_2
     final_plot_scale = 30
     thresh_l = current_phone.thresh_lower
     thresh_h = current_phone.thresh_upper
@@ -78,14 +80,13 @@ def main():
     located_image_features,features_centre = find_battery_features.find_features(image,thresh_l,thresh_h)
     located_image_shapes, shape_centre = find_battery_shape.find_shape(image, thresh_l, thresh_h,epsilon)
 
-    print("template error:" + str(100*calculate_average_error(current_phone.actual_battery_centre, template_centre)))
-    print("features error:" + str(100*calculate_average_error(current_phone.actual_battery_centre, features_centre)))
-    print("shape error:" + str(100*calculate_average_error(current_phone.actual_battery_centre, shape_centre)))
+    template_error = str(100*calculate_average_error(current_phone.actual_battery_centre, template_centre))
+    features_error = str(100*calculate_average_error(current_phone.actual_battery_centre, features_centre))
+    shape_error = str(100*calculate_average_error(current_phone.actual_battery_centre, shape_centre))
 
-    plot_images(located_image_shapes,window_handle,final_plot_scale)
-    plot_images(located_image_features,window_handle + "1",final_plot_scale)
-    plot_images(located_image_template, window_handle + "2", final_plot_scale)
-    print(error*100)
+    plot_images(located_image_template, " find template: ERROR = " + str(template_error) + "%",final_plot_scale)
+    plot_images(located_image_features," find features: ERROR = " + str(features_error) + "%",final_plot_scale)
+    plot_images(located_image_shapes, " find shapes: ERROR = " + str(shape_error) + "%", final_plot_scale)
 
 if __name__ == "__main__":
     main()
