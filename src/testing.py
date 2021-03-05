@@ -17,7 +17,7 @@ class phone:
         self.epsilon = epsilon #Used for approximating in find_battery_shape.py
         self.cnt_area = cnt_area
 
-phone_1 = phone(1, 39, 66,[754,1168],0.05,10000)
+#phone_1 = phone(1, 39, 66,[754,1168],0.05,10000)
 phone_2 = phone(2, 22, 56,[939,1042],0.05,100000)
 phone_3 = phone(3, 53, 87,[663,1278],0.02,500000)
 phone_4 = phone(4, 65, 153,[1174,1607],0.05,500000)
@@ -65,7 +65,7 @@ def plot_images(image,windowhandle,final_plot_scale):
 
 def main():
     current_path = os.path.dirname(__file__)
-    current_phone = phone_3
+    current_phone = phone_2
     final_plot_scale = 30
     thresh_l = current_phone.thresh_lower
     thresh_h = current_phone.thresh_upper
@@ -85,9 +85,16 @@ def main():
     features_error = str(100*calculate_average_error(current_phone.actual_battery_centre, features_centre))
     shape_error = str(100*calculate_average_error(current_phone.actual_battery_centre, shape_centre))
 
-    plot_images(located_image_template, " find template: ERROR = " + str(template_error) + "%",final_plot_scale)
-    plot_images(located_image_features," find features: ERROR = " + str(features_error) + "%",final_plot_scale)
-    plot_images(located_image_shapes, " find shapes: ERROR = " + str(shape_error) + "%", final_plot_scale)
+    str1 = ("template_error: " + str(template_error) + " %  ")
+    str2 = ("features_error: " + str(features_error)+ " %  ")
+    str3 = ("shape_error: " + str(shape_error)+ " %  ")
+
+    #plot_images(located_image_template, " find template: ERROR = " + str(template_error) + "%",final_plot_scale)
+    #plot_images(located_image_features," find features: ERROR = " + str(features_error) + "%",final_plot_scale)
+    #plot_images(located_image_shapes, " find shapes: ERROR = " + str(shape_error) + "%", final_plot_scale)
+
+    joined = np.concatenate ((located_image_template,located_image_features,located_image_shapes),axis=1)
+    plot_images(joined, str1 + str2 + str3, final_plot_scale)
 
 if __name__ == "__main__":
     main()

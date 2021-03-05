@@ -56,7 +56,7 @@ def find_features(input_image,thresh_low,thresh_high):
 
     battery_centre = (int(x + w / 2), int(y + h / 2))
 
-    label = ("BATTERY CENTRE X: " + str(battery_centre[0]) + " Y:" + str(battery_centre[1]))
+    label = ("feature finder - X:" + str(battery_centre[0]) + " Y:" + str(battery_centre[1]))
     battery_outline = cv2.putText(battery_outline, label, (250, 80), cv2.FONT_HERSHEY_SIMPLEX, 2, color = (255, 0, 0),thickness=8)
 
     battery_outline = draw_crosshair(battery_outline, battery_centre)

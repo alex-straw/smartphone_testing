@@ -42,7 +42,7 @@ def find_template(image,template):
 
     battery_centre = (int(top_left[0] + w_t/2), int(top_left[1] + h_t/2))
 
-    label = ("template finder: X: " + str(battery_centre[0]) + " Y:" + str(battery_centre[1]))
+    label = ("template finder - X:" + str(battery_centre[0]) + " Y:" + str(battery_centre[1]))
     battery_label = cv2.putText(battery_outlined, label, (250, 80), cv2.FONT_HERSHEY_SIMPLEX, 2, (0,0,255),thickness=8)
 
     battery_label = draw_crosshair(battery_label,battery_centre)
